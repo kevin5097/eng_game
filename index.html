@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가비 영어-사진 게임</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f8ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .game-box {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      color: #333;
+    }
+    .word {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+    .choices img {
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      object-fit: cover;
+      border: 2px solid #0077cc;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .choices img:hover {
+      transform: scale(1.1);
+      background: #cce4f7;
+    }
+    .result {
+      font-size: 20px;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .score {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-box">
+  <h1>가비 영어-사진 게임</h1>
+  <div class="word" id="word">Loading...</div>
+  <div class="choices" id="choices"></div>
+  <div class="result" id="result"></div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+const questions = [
+  { english: "apple", image: "https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg" },
+  { english: "dog", image: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Golde33443.jpg" },
+  { english: "book", image: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Open_book_nae_02.jpg" },
+  { english: "car", image: "https://upload.wikimedia.org/wikipedia/commons/9/91/Tesla_Model_3_parked%2C_front_driver_side.jpg" },
+  { english: "moon", image: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg" }
+];
+
+let current = 0;
+let score = 0;
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function loadQuestion() {
+  if (current >= questions.length) {
+    document.getElementById('word').textContent = "게임 종료!";
+    document.getElementById('choices').innerHTML = "";
+    document.getElementById('result').textContent = `결과: ${score} 점`;
+    return;
+  }
+
+  const q = questions[current];
+  document.getElementById('word').textContent = q.english;
+
+  // 보기 3개 만들기
+  let choices = [q];
+  while (choices.length < 3) {
+    const random = questions[Math.floor(Math.random() * questions.length)];
+    if (!choices.includes(random)) {
+      choices.push(random);
+    }
+  }
+
+  shuffle(choices);
+
+  // 화면에 이미지 표시
+  const choicesContainer = document.getElementById('choices');
+  choicesContainer.innerHTML = "";
+  choices.forEach((choice, index) => {
+    const img = document.createElement('img');
+    img.src = choice.image;
+    img.onclick = () => checkAnswer(choice);
+    choicesContainer.appendChild(img);
+  });
+
+  document.getElementById('result').textContent = "";
+  document.getElementById('score').textContent = `${current} / ${questions.length} 건`;
+}
+
+function checkAnswer(choice) {
+  if (choice.english === questions[current].english) {
+    document.getElementById('result').textContent = "정답!";
+    document.getElementById('result').style.color = "green";
+    score++;
+  } else {
+    document.getElementById('result').textContent = "다시 시도!";
+    document.getElementById('result').style.color = "red";
+  }
+  current++;
+  setTimeout(loadQuestion, 1000);
+}
+
+loadQuestion();
+</script>
+
+</body>
+</html>
